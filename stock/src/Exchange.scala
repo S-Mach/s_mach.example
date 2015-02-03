@@ -8,7 +8,7 @@ package stock.src
  *           EX: OrderBook with symbol "MSFT", OrderBook with symbol "AMZN"
  *
  */
-class Exchange(name: String, orderbooks: OrderBook) extends OrderRequest {
+class Exchange(name: String, orderbooks: OrderBook*) extends OrderRequest {
   /**
    * Collection of OrderBook objects available for trading within Exchange
    */
