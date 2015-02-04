@@ -10,6 +10,8 @@ import java.util.Comparator
  */
 class OrderBook(val symbol: String) {
 
+  //TODO Comparator for PQs
+
   /**
    * Queue used to organize Buyer Orders
    */
