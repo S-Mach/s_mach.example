@@ -14,11 +14,11 @@ object ExchangeTest {
     val newOrder = new NewOrder ("AMZN", true, 50, "cancel")
 
     nasdaq.orderRequest(newOrder)
-    System.out.println("AMZN offers available: " + nasdaq.validateSymbol("AMZN").buyerQueue.size())
+    System.out.println("AMZN bids available: " + nasdaq.validateSymbol("AMZN").buyerQueue.size())
 
     val cancelPrev = new CancelOrder ("AMZN", true, 50, "cancel", newOrder.orderID)
     nasdaq.orderRequest(cancelPrev)
-    System.out.println("AMZN offers available: " + nasdaq.validateSymbol("AMZN").buyerQueue.size())
+    System.out.println("AMZN bids available: " + nasdaq.validateSymbol("AMZN").buyerQueue.size())
 
   }
 }

@@ -1,7 +1,7 @@
 package stock.src
 
 import java.util.Comparator
-
+import scala.math.Ordering
 /**
  * This class is used to track orders of a particular stock trading symbol
  * made by interested buyers and sellers
@@ -12,6 +12,8 @@ class OrderBook(val symbol: String) {
 
   //TODO Comparator for PQs
 
+  val buyerQueueOrdering = Ordering.by { order: Order => (order.timestamp, order.price)}
+  val sellerQueueOrdering = buyerQueueOrdering.reverse
   /**
    * Queue used to organize Buyer Orders
    */
