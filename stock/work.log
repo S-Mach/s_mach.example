@@ -4,5 +4,5 @@
 02/03/15, rtylerlucas@gmail.com, 2.75, "Implementation of base architecture. Outlined classes and some needed functions."
 02/04/15, rtylerlucas@gmail.com, 1.75, "Working on Order Request handling for Exchange Market"
 02/05/15, rtylerlucas@gmail.com, 1, "Cancelling orders & PQ ordering functionality."
-
+02/07/15, rtylerlucas@gmail.com, 1.5, "Matching Orders and Comparators for buyer / seller PQs"
 
