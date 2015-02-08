@@ -1,4 +1,4 @@
-package stock.src
+package s_mach.example.stock
 
 /**
  * Order represents single instance of order for Exchange transaction.
@@ -40,16 +40,20 @@ object Order {
  * @param price
  * @param cancellationToken String used to verify cancellation requests
  */
-case class BuyOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order {
+case class BuyOrder(
+  symbol: String,
+  price: Double,
+  cancellationToken: String = "cancel"
+) extends Order {
   override val targetOrderID = orderID
 
   def matches(order2: Order): Boolean = {
-    System.out.println("Comparing: "+ this.symbol + ", " + this.price + " vs. " + order2.symbol + ", " + order2.price)
+    println("Comparing: "+ this.symbol + ", " + this.price + " vs. " + order2.symbol + ", " + order2.price)
     if(this.symbol == order2.symbol && this.price >= order2.price){
       true
     }
     else{
-      System.out.println("not equal")
+      println("not equal")
       false
 
     }
@@ -79,3 +83,5 @@ case class CancelBuyOrder(symbol: String, price: Double, cancellationToken: Stri
  * @param targetOrderID The ID of desired cancellation order
  */
 case class CancelSellOrder(symbol: String, price: Double, cancellationToken: String, targetOrderID: Long) extends Order
+
+
