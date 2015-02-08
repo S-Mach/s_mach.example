@@ -1,7 +1,9 @@
 package stock.src
 
 import java.util.Comparator
-import java.util.Collections
+import java.util.PriorityQueue
+
+
 /**
  * This class is used to track orders of a particular stock trading symbol
  * made by interested buyers and sellers
@@ -17,9 +19,9 @@ class OrderBook(val symbol: String) {
    */
   val buyerComparator = new Comparator[Order] {
     def compare(order1: Order, order2: Order): Int ={
-      val price = 0 - order1.price.compareTo(order2.price)
+      var price = 0 - order1.price.compareTo(order2.price)
       if(price==0){
-        return order1.timestamp.compareTo(order2.timestamp)
+        price = order1.timestamp.compareTo(order2.timestamp)
       }
       price
     }
@@ -29,37 +31,92 @@ class OrderBook(val symbol: String) {
    */
   val sellerComparator = new Comparator[Order] {
     def compare(order1: Order, order2: Order): Int ={
-      val price = order1.price.compareTo(order2.price)
+      var price = order1.price.compareTo(order2.price)
       if(price==0){
-        return order1.timestamp.compareTo(order2.timestamp)
+        price = order1.timestamp.compareTo(order2.timestamp)
       }
+
        price
     }
   }
   /**
    * Queue used to organize Buyer Orders
    */
-  var buyerQueue = new java.util.PriorityQueue[Order](defaultQueueSize, buyerComparator)
+  var buyerQueue = new PriorityQueue[Order](defaultQueueSize, buyerComparator)
   /**
    * Queue used to organize Seller Orders
    */
-  var sellerQueue = new java.util.PriorityQueue[Order](defaultQueueSize, sellerComparator)
+  var sellerQueue = new PriorityQueue[Order](defaultQueueSize, sellerComparator)
 
   /**
-   * Method used to handle a match, defined as the instance
-   * a buyerQueue price aligns with a sellerQueue Price
+   * Executes matches in the OrderBook. A match is defined as the instance
+   * when the Order in the front most position of the sellerQueue's price
+   * is equal to or less than the price of the Order in the front most position
+   * of the buyerQueue.
+   *
+   * Note: Priority goes to OLDEST BuyOrder with a buyer price >= seller price.
    */
   def matchHandler(): Unit = {
     if (!buyerQueue.isEmpty() && !sellerQueue.isEmpty())
     {
-      if (buyerQueue.peek().equals(sellerQueue.peek())) {
+      val price = sellerQueue.peek().price
+      if (buyerQueue.peek().price >= price) {
         System.out.println("Match Found!")
-        val price = buyerQueue.poll().price
+        buyerQueue.remove(getOldestMatch(price, buyerQueue))
         sellerQueue.poll()
         System.out.println("Order fulfilled: " + symbol + ", $" + price)
         matchHandler()
       }
     }
+  }
+
+  /**
+   * Finds oldest available order match based on Price and desired Queue
+   * @param price desired price to match. Match price must be >= price
+   * @param queue Specific queue to search for match
+   * @return Oldest available match
+   */
+  def getOldestMatch(price: Double, queue: PriorityQueue[Order]): Order = {
+      if(queue.peek().price > price) {
+        var lowest: Order = queue.peek()
+        var curr: Order = null
+        val iterator = queue.iterator()
+        while (iterator.hasNext) {
+          curr = iterator.next()
+          if (curr.price >= price && curr.timestamp < lowest.timestamp) {
+            lowest = curr
+          }
+        }
+        lowest
+      }
+    else null
+  }
+
+  /**
+   * Returns all OrderBook Orders organized by Buyer/Seller price and timestamp
+   * @return String of OrderBook values
+   */
+  override def toString(): String = {
+    val buyer = new PriorityQueue[Order](buyerQueue)
+    val seller = new PriorityQueue[Order](sellerQueue)
+    var res: String = symbol + ": \n"
+    var curr: Order = null
+    var position = 1
+    res = res + "Buyers: \n"
+    while(!buyer.isEmpty){
+      curr = buyer.poll()
+      res = res + position + ": $" + curr.price + " ," + curr.timestamp + "\n"
+      position += 1
+    }
+    res = res + "Sellers: \n"
+    position = 1
+    while(!seller.isEmpty){
+      curr = seller.poll()
+      res = res + position + ": $" + curr.price + " ," + curr.timestamp + "\n"
+      position += 1
+    }
+
+    return res
   }
 }
 

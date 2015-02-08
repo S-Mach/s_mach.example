@@ -24,8 +24,8 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
     val workingOB = validateSymbol(order.symbol)
 
     order match {
-      case NewBuyOrder(order.symbol, order.price, order.cancellationToken) => workingOB.buyerQueue.add(order); System.out.println("Order Placed.")
-      case NewSellOrder(order.symbol, order.price, order.cancellationToken) => workingOB.sellerQueue.add(order); System.out.println("Order Placed.")
+      case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); System.out.println("Buy Order Placed.")
+      case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); System.out.println("Sell Order Placed.")
 
       case CancelBuyOrder(order.symbol, order.price, order.cancellationToken, order.targetOrderID) => {
         workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, order.targetOrderID))
@@ -38,16 +38,25 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
     workingOB.matchHandler()
   }
 
-
+  /**
+   * Checks for existing OrderBook in orderbooks collection based on symbol
+   * @param symbol OrderBook symbol
+   * @return OrderBook match or null if non-existent
+   */
   def validateSymbol(symbol: String): OrderBook = {
     for (ob <- orderbooks if ob.symbol == symbol) {
-      System.out.println("OrderBook Validated.")
       return ob
     }
     System.out.println("OrderBook: " + symbol + " not found in " + exchangeName)
     null
   }
 
+  /**
+   * Look up Order by OrderID within particular OrderBook.buyerQueue or OrderBook.sellerQueue
+ * @param queue OrderBook.buyerQueue or OrderBook.sellerQueue containing desired Order
+   * @param id OrderID desired
+   * @return Order based on OrderID
+   */
   def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Order ={
     val iterator = queue.iterator()
     while(iterator.hasNext){
@@ -59,9 +68,14 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
     return null
   }
 
+  /**
+   * Offers all available OrderBook entities within Exchange
+   * @return
+   */
   def entities: Seq[String] = {
     for (ob <- orderbooks) yield ob.symbol
   }
+
 }
 
 

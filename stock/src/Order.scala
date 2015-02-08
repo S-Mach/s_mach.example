@@ -21,17 +21,7 @@ sealed trait Order {
 
   val targetOrderID: Long
 
-  def equals(order2: Order): Boolean = {
-    System.out.println("Comparing: "+ this.symbol + ", " + this.price + " vs. " + order2.symbol + ", " + order2.price)
-    if(this.symbol == order2.symbol && this.price == order2.price){
-      true
-    }
-    else{
-      System.out.println("not equal")
-      false
 
-    }
-  }
 }
 
 /**
@@ -51,7 +41,21 @@ object Order {
  * @param price
  * @param cancellationToken String used to verify cancellation requests
  */
-case class NewBuyOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order { override val targetOrderID = orderID}
+case class BuyOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order {
+  override val targetOrderID = orderID
+
+  def matches(order2: Order): Boolean = {
+    System.out.println("Comparing: "+ this.symbol + ", " + this.price + " vs. " + order2.symbol + ", " + order2.price)
+    if(this.symbol == order2.symbol && this.price >= order2.price){
+      true
+    }
+    else{
+      System.out.println("not equal")
+      false
+
+    }
+  }
+}
 
 /**
  * Case class of Order representing a new transaction
@@ -59,7 +63,7 @@ case class NewBuyOrder(symbol: String, price: Double, cancellationToken: String 
  * @param price
  * @param cancellationToken String used to verify cancellation requests
  */
-case class NewSellOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order { override val targetOrderID = orderID}
+case class SellOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order { override val targetOrderID = orderID}
 /**
  * Case class of Order representing cancellation of previous Order
  * @param symbol Distinguishes market symbol for OrderBook trading
