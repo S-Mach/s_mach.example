@@ -1,0 +1,8 @@
+<date>, <email>, <hours>, <description> 
+01/31/15, rtylerlucas@gmail.com, 2, "Inital set-up. Reading documentation & planning case class architecture."
+02/03/15, rtylerlucas@gmail.com, 1, "Reworking architecture after discussion with Lance. Most work is on paper/unimplemented."
+02/03/15, rtylerlucas@gmail.com, 2.75, "Implementation of base architecture. Outlined classes and some needed functions."
+02/04/15, rtylerlucas@gmail.com, 1.75, "Working on Order Request handling for Exchange Market"
+02/05/15, rtylerlucas@gmail.com, 1, "Cancelling orders & PQ ordering functionality."
+02/07/15, rtylerlucas@gmail.com, 1.5, "Matching Orders and Comparators for buyer / seller PQs"
+02/08/15, rtylerlucas@gmail.com, 1.75, "Testing Match, toString, and revisited Order class architecture"
