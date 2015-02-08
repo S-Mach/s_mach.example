@@ -21,7 +21,6 @@ sealed trait Order {
 
   val targetOrderID: Long
 
-
 }
 
 /**
@@ -56,7 +55,6 @@ case class BuyOrder(symbol: String, price: Double, cancellationToken: String = "
     }
   }
 }
-
 /**
  * Case class of Order representing a new transaction
  * @param symbol distinguishes market symbol for OrderBook trading

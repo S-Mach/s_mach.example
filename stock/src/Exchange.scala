@@ -20,20 +20,20 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
    * Processes orders
    * @param order Attempts to fulfill passed Order
    */
-  def orderRequest(order: Order): Unit ={
+  def orderRequest(order: Order): Unit = {
     val workingOB = validateSymbol(order.symbol)
 
     order match {
       case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); System.out.println("Buy Order Placed.")
       case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); System.out.println("Sell Order Placed.")
 
-      case CancelBuyOrder(order.symbol, order.price, order.cancellationToken, order.targetOrderID) => {
-        workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, order.targetOrderID))
-        System.out.println("Order Removed.")
+      case cancelBuyOrder: CancelBuyOrder => {
+        workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, cancelBuyOrder.targetOrderID))
+        System.out.println("Buy Order Removed.")
       }
-      case CancelSellOrder(order.symbol, order.price, order.cancellationToken, order.targetOrderID) => workingOB.sellerQueue.remove(order); System.out.println("Order Removed.")
+      case cancelSellOrder: CancelSellOrder => {
         workingOB.sellerQueue.remove(getOrderByID(workingOB.sellerQueue, order.targetOrderID))
-        System.out.println("Order Removed.")
+        System.out.println("Sell Order Removed.")
     }
     workingOB.matchHandler()
   }
@@ -57,7 +57,7 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
    * @param id OrderID desired
    * @return Order based on OrderID
    */
-  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Order ={
+  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Order = {
     val iterator = queue.iterator()
     while(iterator.hasNext){
       val current = iterator.next()
