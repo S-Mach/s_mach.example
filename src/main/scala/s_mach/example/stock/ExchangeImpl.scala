@@ -1,4 +1,4 @@
-package stock.src
+package s_mach.example.stock
 
 /**
  * This class is used to demonstrate a stock exchange simulation
@@ -10,7 +10,7 @@ package stock.src
  * Ideas for general exchange structure generated from:
  * Resource: http://falconair.github.io/2015/01/05/financial-exchange.html
  */
-class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends OrderRequest {
+class ExchangeImpl(val exchangeName: String, val orderbooks: OrderBook*) extends Exchange {
   /**
    * Number of Entities within Exchange
    */
@@ -24,16 +24,15 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
     val workingOB = validateSymbol(order.symbol)
 
     order match {
-      case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); System.out.println("Buy Order Placed.")
-      case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); System.out.println("Sell Order Placed.")
+      case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); println("Buy Order Placed.")
+      case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); println("Sell Order Placed.")
 
-      case cancelBuyOrder: CancelBuyOrder => {
+      case cancelBuyOrder: CancelBuyOrder =>
         workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, cancelBuyOrder.targetOrderID))
-        System.out.println("Buy Order Removed.")
-      }
-      case cancelSellOrder: CancelSellOrder => {
+        println("Buy Order Removed.")
+      case cancelSellOrder: CancelSellOrder =>
         workingOB.sellerQueue.remove(getOrderByID(workingOB.sellerQueue, order.targetOrderID))
-        System.out.println("Sell Order Removed.")
+        println("Sell Order Removed.")
     }
     workingOB.matchHandler()
   }
@@ -47,7 +46,7 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
     for (ob <- orderbooks if ob.symbol == symbol) {
       return ob
     }
-    System.out.println("OrderBook: " + symbol + " not found in " + exchangeName)
+    println("OrderBook: " + symbol + " not found in " + exchangeName)
     null
   }
 
@@ -57,15 +56,16 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
    * @param id OrderID desired
    * @return Order based on OrderID
    */
-  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Order = {
+  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Option[Order] = {
+
     val iterator = queue.iterator()
     while(iterator.hasNext){
       val current = iterator.next()
       if (current.orderID == id){
-        return current
+        return Some(current)
       }
     }
-    return null
+    None
   }
 
   /**
@@ -77,7 +77,3 @@ class Exchange(val exchangeName: String, val orderbooks: OrderBook*) extends Ord
   }
 
 }
-
-
-
-

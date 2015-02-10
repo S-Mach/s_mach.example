@@ -1,4 +1,4 @@
-package stock.src
+package s_mach.example.stock
 
 import java.util.Comparator
 import java.util.PriorityQueue
@@ -61,10 +61,10 @@ class OrderBook(val symbol: String) {
     {
       val price = sellerQueue.peek().price
       if (buyerQueue.peek().price >= price) {
-        System.out.println("Match Found!")
+        println("Match Found!")
         buyerQueue.remove(getOldestMatch(price, buyerQueue))
         sellerQueue.poll()
-        System.out.println("Order fulfilled: " + symbol + ", $" + price)
+        println("Order fulfilled: " + symbol + ", $" + price)
         matchHandler()
       }
     }
