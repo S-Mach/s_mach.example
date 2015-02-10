@@ -2,6 +2,7 @@ package s_mach.example.stock
 
 import java.util.Comparator
 import java.util.PriorityQueue
+import scala.util.control._
 
 
 /**
@@ -59,37 +60,58 @@ class OrderBook(val symbol: String) {
   def matchHandler(): Unit = {
     if (!buyerQueue.isEmpty() && !sellerQueue.isEmpty())
     {
-      val price = sellerQueue.peek().price
-      if (buyerQueue.peek().price >= price) {
+      val seller = sellerQueue.peek()
+
+
+      if (buyerQueue.peek().price >= seller.price) {
+
         println("Match Found!")
-        buyerQueue.remove(getOldestMatch(price, buyerQueue))
-        sellerQueue.poll()
-        println("Order fulfilled: " + symbol + ", $" + price)
-        matchHandler()
+        val matchedBuyer = getOldestMatch(seller.price)
+        matchedBuyer match {
+          case Some(buyer) => {
+            if (buyer.qty > seller.qty) {
+              buyer.qty = buyer.qty - seller.qty
+              sellerQueue.poll()
+            }
+            else if (buyer.qty < seller.qty) {
+              seller.qty = seller.qty - buyer.qty
+              buyerQueue.remove(buyer)
+            }
+            else { //they're equal!
+              buyerQueue.remove(buyer)
+              sellerQueue.poll()
+            }
+            matchHandler()
+          }
+          case None => println("No Match Error")
+        }
+
       }
     }
+
   }
 
   /**
    * Finds oldest available order match based on Price and desired Queue
    * @param price desired price to match. Match price must be >= price
-   * @param queue Specific queue to search for match
    * @return Oldest available match
    */
-  private def getOldestMatch(price: Double, queue: PriorityQueue[Order]): Order = {
-      if(queue.peek().price > price) {
-        var lowest: Order = queue.peek()
-        var curr: Order = null
-        val iterator = queue.iterator()
-        while (iterator.hasNext) {
-          curr = iterator.next()
-          if (curr.price >= price && curr.timestamp < lowest.timestamp) {
-            lowest = curr
-          }
+  private def getOldestMatch(price: Double): Option[Order] = {
+    val bqCpy = new PriorityQueue[Order](buyerQueue)
+    var lowest = bqCpy.peek()
+    val loop = new Breaks
+    loop.breakable {
+      while (bqCpy.peek().price >= price) {
+
+        if (bqCpy.peek().price >= price & bqCpy.peek().timestamp < lowest.timestamp) {
+          lowest = bqCpy.peek()
         }
-        lowest
+        bqCpy.poll()
+        if ( bqCpy.isEmpty ) loop.break()
       }
-    else null
+    }
+    if(lowest.price >= price ) {Some(lowest)}
+    else None
   }
 
   /**
@@ -105,14 +127,14 @@ class OrderBook(val symbol: String) {
     res = res + "Buyers: \n"
     while(!buyer.isEmpty){
       curr = buyer.poll()
-      res = res + position + ": $" + curr.price + " ," + curr.timestamp + "\n"
+      res = res + position + ": $" + curr.price + " ," + "Shares: " + curr.qty + ", Time: " + curr.timestamp + "\n"
       position += 1
     }
     res = res + "Sellers: \n"
     position = 1
     while(!seller.isEmpty){
       curr = seller.poll()
-      res = res + position + ": $" + curr.price + " ," + curr.timestamp + "\n"
+      res = res + position + ": $" + curr.price + " ," + "Shares: " + curr.qty + ", Time: " + curr.timestamp + "\n"
       position += 1
     }
 
