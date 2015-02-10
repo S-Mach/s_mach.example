@@ -4,21 +4,21 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class ExchangeTest extends FlatSpec with Matchers {
 
-  "OrderBook" should "construct an order correctly" in {
-    val amzn = new OrderBook("AMZN")
-    assert(amzn.symbol == "AMZN")
-
-//    amzn.symbol should equal("AMZN")
-//
-  }
-
-  "Exchange" should "construct an order correctly" in {
+  "Exchange" should "construct an exchange correctly" in {
     val amzn = new OrderBook("AMZN")
     val msft = new OrderBook("MSFT")
     val appl = new OrderBook("APPL")
     val goog = new OrderBook("GOOG")
+
     val nasdaq = Exchange("NASDAQ", amzn, msft, appl, goog)
+    assert(nasdaq.exchangeName == "NASDAQ")
+
   }
+
+  //order request handling
+
+  
+
 
 //  def main (args: Array[String]) {
 //

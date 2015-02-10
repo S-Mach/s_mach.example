@@ -8,7 +8,13 @@ class OrderBookTest extends FlatSpec with Matchers {
     val amzn = new OrderBook("AMZN")
     assert(amzn.symbol == "AMZN")
 
-    //    amzn.symbol should equal("AMZN")
+    //PQ ordering and priority
+
+    //match testing
+
+    //adding removing
+
     //
+
   }
 }
