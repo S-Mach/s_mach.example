@@ -76,7 +76,7 @@ class OrderBook(val symbol: String) {
    * @param queue Specific queue to search for match
    * @return Oldest available match
    */
-  def getOldestMatch(price: Double, queue: PriorityQueue[Order]): Order = {
+  private def getOldestMatch(price: Double, queue: PriorityQueue[Order]): Order = {
       if(queue.peek().price > price) {
         var lowest: Order = queue.peek()
         var curr: Order = null

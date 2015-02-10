@@ -21,33 +21,41 @@ class ExchangeImpl(val exchangeName: String, val orderbooks: OrderBook*) extends
    * @param order Attempts to fulfill passed Order
    */
   def orderRequest(order: Order): Unit = {
-    val workingOB = validateSymbol(order.symbol)
 
-    order match {
-      case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); println("Buy Order Placed.")
-      case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); println("Sell Order Placed.")
+      validateSymbol(order.symbol) match {
+        case Some(workbook) => {
+          order match {
+            case buyOrder: BuyOrder => workbook.buyerQueue.add(buyOrder);
+              println("Buy Order Placed.")
 
-      case cancelBuyOrder: CancelBuyOrder =>
-        workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, cancelBuyOrder.targetOrderID))
-        println("Buy Order Removed.")
-      case cancelSellOrder: CancelSellOrder =>
-        workingOB.sellerQueue.remove(getOrderByID(workingOB.sellerQueue, order.targetOrderID))
-        println("Sell Order Removed.")
+            case sellOrder: SellOrder => workbook.sellerQueue.add(sellOrder);
+              println("Sell Order Placed.")
+
+            case cancelBuyOrder: CancelBuyOrder =>
+              workbook.buyerQueue.remove(getOrderByID(workbook.buyerQueue, cancelBuyOrder.targetOrderID))
+              println("Buy Order Removed.")
+
+            case cancelSellOrder: CancelSellOrder =>
+              workbook.sellerQueue.remove(getOrderByID(workbook.sellerQueue, order.targetOrderID))
+              println("Sell Order Removed.")
+          }
+        workbook.matchHandler()
+      }
+      case None => println("No symbol found")
     }
-    workingOB.matchHandler()
   }
+
 
   /**
    * Checks for existing OrderBook in orderbooks collection based on symbol
    * @param symbol OrderBook symbol
-   * @return OrderBook match or null if non-existent
+   * @return OrderBook match or None if non-existent
    */
-  def validateSymbol(symbol: String): OrderBook = {
+   def validateSymbol(symbol: String): Option[OrderBook] = {
     for (ob <- orderbooks if ob.symbol == symbol) {
-      return ob
+      return Some(ob)
     }
-    println("OrderBook: " + symbol + " not found in " + exchangeName)
-    null
+    None
   }
 
   /**

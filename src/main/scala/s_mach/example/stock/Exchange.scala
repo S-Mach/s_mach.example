@@ -30,7 +30,7 @@ trait Exchange {
    * @param symbol OrderBook symbol
    * @return OrderBook match or null if non-existent
    */
-  def validateSymbol(symbol: String): OrderBook
+  def validateSymbol(symbol: String): Option[OrderBook]
 
   /**
    * Offers all available OrderBook entities within Exchange

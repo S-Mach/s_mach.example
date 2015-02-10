@@ -12,12 +12,24 @@ class ExchangeTest extends FlatSpec with Matchers {
 
     val nasdaq = Exchange("NASDAQ", amzn, msft, appl, goog)
     assert(nasdaq.exchangeName == "NASDAQ")
+    assert(nasdaq.size == 4)
+    assert(nasdaq.validateSymbol("TYLR") == None)
 
   }
+  it should "validate symbols and fulfill orders correctly" in {
 
+    val nasdaq = Exchange("NASDAQ", new OrderBook("AMZN"))
+    nasdaq.orderRequest(new BuyOrder("AMZN", 50))
+    nasdaq.validateSymbol("AMZN") match {
+      case Some(wb) => assert(wb.buyerQueue.size() == 1)
+      case None => assert(false)
+
+    }
+  }
+}
   //order request handling
 
-  
+
 
 
 //  def main (args: Array[String]) {
@@ -57,4 +69,4 @@ class ExchangeTest extends FlatSpec with Matchers {
 //
 //    println(nasdaq.validateSymbol("AMZN").toString)
 //  }
-}
+
