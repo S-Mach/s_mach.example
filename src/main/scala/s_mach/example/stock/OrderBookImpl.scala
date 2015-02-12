@@ -13,6 +13,7 @@ import scala.util.control._
  */
 class OrderBookImpl(val symbol: String) extends OrderBook {
 
+  val defaultQueueSize: Int = 11
   /**
    * buyerComparator sorted buy highest price & lowest timestamp
    */
@@ -42,11 +43,11 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
   /**
    * Queue used to organize Buyer Orders
    */
-  var buyerQueue = new PriorityQueue[Order](defaultQueueSize, buyerComparator)
+  private var buyerQueue = new PriorityQueue[Order](defaultQueueSize, buyerComparator)
   /**
    * Queue used to organize Seller Orders
    */
-  var sellerQueue = new PriorityQueue[Order](defaultQueueSize, sellerComparator)
+  private var sellerQueue = new PriorityQueue[Order](defaultQueueSize, sellerComparator)
 
   /**
    * Executes matches in the OrderBook. A match is defined as the instance
@@ -88,6 +89,50 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
     }
   }
 
+  def processOrder(order: Order) = {
+    order match{
+      case buyOrder: BuyOrder => buyerQueue.add(buyOrder)
+      case sellOrder: SellOrder => sellerQueue.add(sellOrder)
+      case cancelBuyOrder: CancelBuyOrder => {
+        buyerQueue.remove(getOrderByID(buyerQueue, cancelBuyOrder.targetOrderID))
+      }
+      case cancelSellOrder: CancelSellOrder => {
+        sellerQueue.remove(getOrderByID(sellerQueue, cancelSellOrder.targetOrderID))
+      }
+    }
+  }
+
+  def getBuyers : Option[Array[Order]] = {
+    if(buyerQueue.isEmpty){
+      None
+    }
+    else {
+      val bqCpy = new PriorityQueue[Order](buyerQueue)
+      val buyers = new Array[Order](bqCpy.size())
+      var x = 0
+      while(x < bqCpy.size()) {
+        buyers(x) = bqCpy.poll()
+        x+=1
+      }
+      Some(buyers)
+    }
+  }
+  def getSellers : Option[Array[Order]] = {
+    if(sellerQueue.isEmpty){
+      None
+    }
+    else {
+      val sqCpy = new PriorityQueue[Order](sellerQueue)
+      val sellers = new Array[Order](sqCpy.size())
+      var x = 0
+      while(x < sqCpy.size()) {
+        sellers(x) = sqCpy.poll()
+        x+=1
+      }
+      Some(sellers)
+    }
+  }
+
   /**
    * Finds oldest available order match based on Price and desired Queue
    * @param price desired price to match. Match price must be >= price
@@ -100,7 +145,8 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
     loop.breakable {
       while (bqCpy.peek().price >= price) {
 
-        if (bqCpy.peek().price >= price & bqCpy.peek().timestamp < lowest.timestamp) {
+        if (bqCpy.peek().price >= price
+          & bqCpy.peek().timestamp < lowest.timestamp) {
           lowest = bqCpy.peek()
         }
         bqCpy.poll()
@@ -111,21 +157,25 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
     else None
   }
 
+  /**
+   * Look up Order by OrderID within particular OrderBook.buyerQueue or OrderBook.sellerQueue
+   * @param queue OrderBook.buyerQueue or OrderBook.sellerQueue containing desired Order
+   * @param id OrderID desired
+   * @return Order based on OrderID
+   */
+  private def getOrderByID(
+    queue: java.util.PriorityQueue[Order],
+    id: Long): Option[Order] = {
 
-  def addBuyer(order: Order): Boolean = {
-    order match{
-      case buyOrder: BuyOrder => buyerQueue.add(buyOrder); true
-      case _ => false
+    val iterator = queue.iterator()
+    while(iterator.hasNext){
+      val current = iterator.next()
+      if (current.orderID == id){
+        return Some(current)
+      }
     }
+    None
   }
-  def addSeller(order: Order): Boolean = {
-    order match{
-      case sellOrder: SellOrder => sellerQueue.add(sellOrder); true
-      case _ => false
-    }
-  }
-  //TODO: Add cancel methods
-  //TODO: Create more general processOrders method
   /**
    * Returns all OrderBook Orders organized by Buyer/Seller price and timestamp
    * @return String of OrderBook values
@@ -135,7 +185,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
     val seller = new PriorityQueue[Order](sellerQueue)
     var res: String = symbol + ": \n"
     var curr: Order = null
-    var position = 1
+    var position = 12
     res = res + "Buyers: \n"
     while(!buyer.isEmpty){
       curr = buyer.poll()

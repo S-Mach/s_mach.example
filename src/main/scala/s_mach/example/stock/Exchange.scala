@@ -13,6 +13,7 @@ package s_mach.example.stock
 trait Exchange {
 
   def exchangeName: String
+
   def orderbooks: Seq[OrderBook]
   /**
    * Number of Entities within Exchange

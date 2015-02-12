@@ -9,8 +9,12 @@ class OrderBookTest extends FlatSpec with Matchers {
     assert(amzn.symbol == "AMZN")
     val buyOrder = new BuyOrder("AMZN", 50, 5)
     //PQ ordering and priority
-    assert(amzn.addBuyer(buyOrder))
-    assert(amzn.addSeller(buyOrder)==false)
+    amzn.processOrder(buyOrder)
+    amzn.getBuyers match {
+      case Some(arr) => println(arr(0).price)
+      case None => println("error")
+    }
+
     //match testing
 
     //adding removing

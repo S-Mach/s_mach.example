@@ -23,28 +23,10 @@ class ExchangeImpl(val exchangeName: String, val orderbooks: OrderBook*) extends
   def orderRequest(order: Order): Unit = {
 
       validateSymbol(order.symbol) match {
-        case Some(workbook) => {
-          order match {
-            case buyOrder: BuyOrder => workbook.buyerQueue.add(buyOrder);
-              println("Buy Order Placed.")
-
-            case sellOrder: SellOrder => workbook.sellerQueue.add(sellOrder);
-              println("Sell Order Placed.")
-
-            case cancelBuyOrder: CancelBuyOrder =>
-              workbook.buyerQueue.remove(getOrderByID(workbook.buyerQueue, cancelBuyOrder.targetOrderID))
-              println("Buy Order Removed.")
-
-            case cancelSellOrder: CancelSellOrder =>
-              workbook.sellerQueue.remove(getOrderByID(workbook.sellerQueue, order.targetOrderID))
-              println("Sell Order Removed.")
-          }
-        workbook.matchHandler()
-      }
+        case Some(workbook) => workbook.processOrder(order); workbook.matchHandler()
       case None => println("No symbol found")
     }
   }
-
 
   /**
    * Checks for existing OrderBook in orderbooks collection based on symbol
@@ -54,24 +36,6 @@ class ExchangeImpl(val exchangeName: String, val orderbooks: OrderBook*) extends
    def validateSymbol(symbol: String): Option[OrderBook] = {
     for (ob <- orderbooks if ob.symbol == symbol) {
       return Some(ob)
-    }
-    None
-  }
-
-  /**
-   * Look up Order by OrderID within particular OrderBook.buyerQueue or OrderBook.sellerQueue
- * @param queue OrderBook.buyerQueue or OrderBook.sellerQueue containing desired Order
-   * @param id OrderID desired
-   * @return Order based on OrderID
-   */
-  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Option[Order] = {
-
-    val iterator = queue.iterator()
-    while(iterator.hasNext){
-      val current = iterator.next()
-      if (current.orderID == id){
-        return Some(current)
-      }
     }
     None
   }

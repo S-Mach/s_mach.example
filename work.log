@@ -11,4 +11,7 @@
 02/10/15, rtylerlucas@gmail.com, 1, "Changing instances of Null to None. Took some rearranging. Good to learn."
 02/10/15, rtylerlucas@gmail.com, 2.25, "Implemented quantity for Orders and trading. Updated matching alg."
 02/12/15, rtylerlucas@gmail.com, 0.75, "Seperated OrderBook implementation from trait. Added some testing."
+02/12/15, rtylerlucas@gmail.com, 1, "Worked on OrderBook processing methods and trait contract."
+
+
 
