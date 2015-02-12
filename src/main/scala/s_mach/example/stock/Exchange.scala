@@ -3,8 +3,8 @@ package s_mach.example.stock
 /**
  * This class is used to demonstrate a stock exchange simulation
  * leveraging Scala tools and functionality.
- * @param exchangeName Name of exchange entity. (EX: NASDAQ)
- * @param orderbooks Accepts multiple instances of OrderBook for particular stocks
+ * exchangeName Name of exchange entity. (EX: NASDAQ)
+ * orderbooks Accepts multiple instances of OrderBook for particular stocks
  *           EX: OrderBook with symbol "MSFT", OrderBook with symbol "AMZN"
  *
  * Ideas for general exchange structure generated from:
