@@ -29,36 +29,32 @@ class ExchangeTest extends FlatSpec with Matchers {
 
     nasdaq.orderRequest(new BuyOrder("AMZN", 55, 10))
 
-    nasdaq.validateSymbol("AMZN") match {
-      case Some(wb) => {
-//        assert(wb.buyerQueue.size() == 2)
-//        assert(wb.sellerQueue.size() == 3)
-        println(wb.toString)
-      }
-      case None => assert(false)
-    }
+//    nasdaq.validateSymbol("AMZN") match {
+//      case Some(wb) => {
+//        println(wb.toString)
+//      }
+//      case None => assert(false)
+//    }
 
     nasdaq.orderRequest(new BuyOrder("AMZN", 60, 150))
     // Transaction occurs. Buys all $60/100 shares in exchange, still desires 50 shares
 
-    nasdaq.validateSymbol("AMZN") match {
-      case Some(wb) => {
-//        assert(wb.buyerQueue.size() == 3)
-//        assert(wb.sellerQueue.size() == 2)
-        println(wb.toString)
-      }
-      case None => assert(false)
-    }
+//    nasdaq.validateSymbol("AMZN") match {
+//      case Some(wb) => {
+//        println(wb.toString)
+//      }
+//      case None => assert(false)
+//    }
 
     nasdaq.orderRequest(new SellOrder("AMZN", 50, 10))
     // Transaction occurs. Sells all $50/100 shares in exchange, should hit oldest price match
 
-    nasdaq.validateSymbol("AMZN") match {
-      case Some(wb) => {
-        println(wb.toString)
-      }
-      case None => assert(false)
-    }
+//    nasdaq.validateSymbol("AMZN") match {
+//      case Some(wb) => {
+//        println(wb.toString)
+//      }
+//      case None => assert(false)
+//    }
 
 
 
@@ -69,10 +65,10 @@ class ExchangeTest extends FlatSpec with Matchers {
 /**
  * Developer Notes: Tyler Lucas
  *
- * The method oldestMatchHandler in OrderBook is used to find the oldest available buyer
+ * The method oldestMatchHandler in OrderBookImpl is used to find the oldest available buyer
  * with a price that matches the current sell price. This method is successful for all
- * instances of a lower match price with a a lower timestamp that still fulfills seller price
- * EXCEPT for one currently unfixable bug: if both orders are placed within a millisecond of each other,
+ * instances of a match price lower than the front of the buyer queue but with a older timestamp, still fulfilling
+ * the asking seller price... EXCEPT for one current bug: if both orders are placed within a millisecond of each other,
  * the higher priced order is fulfilled in the transaction REGARDLESS of timestamp. This is due to the limitation
  * of the system timestamp Long.
  */

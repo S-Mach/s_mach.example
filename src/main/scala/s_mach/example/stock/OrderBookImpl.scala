@@ -39,7 +39,6 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
        price
     }
   }
-  //TODO: Make queues private, use methods
   /**
    * Queue used to organize Buyer Orders
    */
@@ -102,6 +101,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
     }
   }
 
+
   def getBuyers : Option[Array[Order]] = {
     if(buyerQueue.isEmpty){
       None
@@ -110,7 +110,8 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
       val bqCpy = new PriorityQueue[Order](buyerQueue)
       val buyers = new Array[Order](bqCpy.size())
       var x = 0
-      while(x < bqCpy.size()) {
+
+      while(!bqCpy.isEmpty) {
         buyers(x) = bqCpy.poll()
         x+=1
       }
@@ -125,7 +126,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
       val sqCpy = new PriorityQueue[Order](sellerQueue)
       val sellers = new Array[Order](sqCpy.size())
       var x = 0
-      while(x < sqCpy.size()) {
+      while(!sqCpy.isEmpty) {
         sellers(x) = sqCpy.poll()
         x+=1
       }

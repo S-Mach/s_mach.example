@@ -12,15 +12,26 @@ sealed trait Order {
    * The symbol distinguishing OrderBook used for trading
    */
   val symbol: String
-
+  /**
+   * Price of Order
+   */
   val price: Double
-
+  /**
+   * Quantity of order
+   */
   var qty: Int
 
   val timestamp: Long = System.currentTimeMillis()
-
+  /**
+   * String used when cancelling particular order.
+   * Verifies intent and ownership of order.
+   */
   val cancellationToken: String
-
+  /**
+   * Variable describing the target of the order.
+   * For typical buy and sell orders, targetId == orderId.
+   * For cancellation orders, targetId == desired orderId to cancel.
+   */
   val targetOrderID: Long
 
 
@@ -75,7 +86,7 @@ case class CancelBuyOrder(
   price: Double,
   cancellationToken: String,
   targetOrderID: Long)
-  extends Order {override var qty = 0}
+  extends Order {var qty = 0}
 /**
  * Case class of Order representing cancellation of previous Order
  * @param symbol Distinguishes market symbol for OrderBook trading
@@ -88,6 +99,6 @@ case class CancelSellOrder(
  price: Double,
  cancellationToken: String,
  targetOrderID: Long)
- extends Order {override var qty = 0}
+ extends Order {var qty = 0}
 
 
