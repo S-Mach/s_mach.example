@@ -3,8 +3,8 @@ package s_mach.example.stock
 /**
  * This class is used to demonstrate a stock exchange simulation
  * leveraging Scala tools and functionality.
- * @param exchangeName Name of exchange entity. (EX: NASDAQ)
- * @param orderbooks Accepts multiple instances of OrderBook for particular stocks
+ * exchangeName Name of exchange entity. (EX: NASDAQ)
+ * orderbooks Accepts multiple instances of OrderBook for particular stocks
  *           EX: OrderBook with symbol "MSFT", OrderBook with symbol "AMZN"
  *
  * Ideas for general exchange structure generated from:
@@ -13,6 +13,7 @@ package s_mach.example.stock
 trait Exchange {
 
   def exchangeName: String
+
   def orderbooks: Seq[OrderBook]
   /**
    * Number of Entities within Exchange
@@ -30,7 +31,7 @@ trait Exchange {
    * @param symbol OrderBook symbol
    * @return OrderBook match or null if non-existent
    */
-  def validateSymbol(symbol: String): OrderBook
+  def validateSymbol(symbol: String): Option[OrderBook]
 
   /**
    * Offers all available OrderBook entities within Exchange

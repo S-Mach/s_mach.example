@@ -21,49 +21,21 @@ class ExchangeImpl(val exchangeName: String, val orderbooks: OrderBook*) extends
    * @param order Attempts to fulfill passed Order
    */
   def orderRequest(order: Order): Unit = {
-    val workingOB = validateSymbol(order.symbol)
 
-    order match {
-      case buyOrder: BuyOrder => workingOB.buyerQueue.add(buyOrder); println("Buy Order Placed.")
-      case sellOrder: SellOrder => workingOB.sellerQueue.add(sellOrder); println("Sell Order Placed.")
-
-      case cancelBuyOrder: CancelBuyOrder =>
-        workingOB.buyerQueue.remove(getOrderByID(workingOB.buyerQueue, cancelBuyOrder.targetOrderID))
-        println("Buy Order Removed.")
-      case cancelSellOrder: CancelSellOrder =>
-        workingOB.sellerQueue.remove(getOrderByID(workingOB.sellerQueue, order.targetOrderID))
-        println("Sell Order Removed.")
+      validateSymbol(order.symbol) match {
+        case Some(workbook) => workbook.processOrder(order); workbook.matchHandler()
+      case None => println("No symbol found")
     }
-    workingOB.matchHandler()
   }
 
   /**
    * Checks for existing OrderBook in orderbooks collection based on symbol
    * @param symbol OrderBook symbol
-   * @return OrderBook match or null if non-existent
+   * @return OrderBook match or None if non-existent
    */
-  def validateSymbol(symbol: String): OrderBook = {
+   def validateSymbol(symbol: String): Option[OrderBook] = {
     for (ob <- orderbooks if ob.symbol == symbol) {
-      return ob
-    }
-    println("OrderBook: " + symbol + " not found in " + exchangeName)
-    null
-  }
-
-  /**
-   * Look up Order by OrderID within particular OrderBook.buyerQueue or OrderBook.sellerQueue
- * @param queue OrderBook.buyerQueue or OrderBook.sellerQueue containing desired Order
-   * @param id OrderID desired
-   * @return Order based on OrderID
-   */
-  def getOrderByID(queue: java.util.PriorityQueue[Order], id: Long): Option[Order] = {
-
-    val iterator = queue.iterator()
-    while(iterator.hasNext){
-      val current = iterator.next()
-      if (current.orderID == id){
-        return Some(current)
-      }
+      return Some(ob)
     }
     None
   }

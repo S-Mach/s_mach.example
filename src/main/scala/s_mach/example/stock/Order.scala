@@ -12,14 +12,28 @@ sealed trait Order {
    * The symbol distinguishing OrderBook used for trading
    */
   val symbol: String
-
+  /**
+   * Price of Order
+   */
   val price: Double
+  /**
+   * Quantity of order
+   */
+  var qty: Int
 
   val timestamp: Long = System.currentTimeMillis()
-
+  /**
+   * String used when cancelling particular order.
+   * Verifies intent and ownership of order.
+   */
   val cancellationToken: String
-
+  /**
+   * Variable describing the target of the order.
+   * For typical buy and sell orders, targetId == orderId.
+   * For cancellation orders, targetId == desired orderId to cancel.
+   */
   val targetOrderID: Long
+
 
 }
 
@@ -38,34 +52,28 @@ object Order {
  * Case class of Order representing a new transaction
  * @param symbol distinguishes market symbol for OrderBook trading
  * @param price
+*  @param qty
  * @param cancellationToken String used to verify cancellation requests
  */
 case class BuyOrder(
   symbol: String,
   price: Double,
-  cancellationToken: String = "cancel"
-) extends Order {
-  override val targetOrderID = orderID
-
-  def matches(order2: Order): Boolean = {
-    println("Comparing: "+ this.symbol + ", " + this.price + " vs. " + order2.symbol + ", " + order2.price)
-    if(this.symbol == order2.symbol && this.price >= order2.price){
-      true
-    }
-    else{
-      println("not equal")
-      false
-
-    }
-  }
-}
+  var qty: Int,
+  cancellationToken: String = "cancel")
+  extends Order { override val targetOrderID = orderID}
 /**
  * Case class of Order representing a new transaction
  * @param symbol distinguishes market symbol for OrderBook trading
  * @param price
+ * @param qty
  * @param cancellationToken String used to verify cancellation requests
  */
-case class SellOrder(symbol: String, price: Double, cancellationToken: String = "cancel") extends Order { override val targetOrderID = orderID}
+case class SellOrder(
+  symbol: String,
+  price: Double,
+  var qty: Int,
+  cancellationToken: String = "cancel")
+  extends Order { override val targetOrderID = orderID}
 /**
  * Case class of Order representing cancellation of previous Order
  * @param symbol Distinguishes market symbol for OrderBook trading
@@ -73,8 +81,12 @@ case class SellOrder(symbol: String, price: Double, cancellationToken: String = 
  * @param cancellationToken String used to verify cancellation requests
  * @param targetOrderID The ID of desired cancellation order
  */
-case class CancelBuyOrder(symbol: String, price: Double, cancellationToken: String, targetOrderID: Long) extends Order
-
+case class CancelBuyOrder(
+  symbol: String,
+  price: Double,
+  cancellationToken: String,
+  targetOrderID: Long)
+  extends Order {var qty = 0}
 /**
  * Case class of Order representing cancellation of previous Order
  * @param symbol Distinguishes market symbol for OrderBook trading
@@ -82,6 +94,11 @@ case class CancelBuyOrder(symbol: String, price: Double, cancellationToken: Stri
  * @param cancellationToken String used to verify cancellation requests
  * @param targetOrderID The ID of desired cancellation order
  */
-case class CancelSellOrder(symbol: String, price: Double, cancellationToken: String, targetOrderID: Long) extends Order
+case class CancelSellOrder(
+ symbol: String,
+ price: Double,
+ cancellationToken: String,
+ targetOrderID: Long)
+ extends Order {var qty = 0}
 
 
