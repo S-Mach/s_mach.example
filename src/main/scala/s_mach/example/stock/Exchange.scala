@@ -15,17 +15,27 @@ trait Exchange {
   def exchangeName: String
 
   def orderbooks: Seq[OrderBook]
+
+  // TODO: isn't this just orderbooks.size?
   /**
    * Number of Entities within Exchange
    */
   def size : Int
 
+  // TODO: when naming side-effectful methods use a verb first e.g.
+  // TODO: handleOrderRequest
+  // TODO: can this operation fail? If so, what information would be helpful to
+  // TODO: caller when there is a failure?
   /**
    * Processes orders
    * @param order Attempts to fulfill passed Order
    */
   def orderRequest(order: Order): Unit
 
+  // TODO: a validate method typically returns Boolean or a list of errors
+  // TODO: Maybe a simpler interface to have orderbooks return
+  // TODO: Map[Symbol,OrderBook]? Can consolidate orderbooks, size,
+  // TODO: validateSymbol and entities
   /**
    * Checks for existing OrderBook in orderbooks collection based on symbol
    * @param symbol OrderBook symbol
@@ -33,6 +43,7 @@ trait Exchange {
    */
   def validateSymbol(symbol: String): Option[OrderBook]
 
+  // TODO: is an 'entity' the same as a stock symbol?
   /**
    * Offers all available OrderBook entities within Exchange
    * @return

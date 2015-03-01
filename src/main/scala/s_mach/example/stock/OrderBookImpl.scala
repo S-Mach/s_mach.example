@@ -17,6 +17,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
   /**
    * buyerComparator sorted buy highest price & lowest timestamp
    */
+  // TODO: to use Scala PriorityQueue, these need to be converted to Ordering
   val buyerComparator = new Comparator[Order] {
     def compare(order1: Order, order2: Order): Int ={
       var price = 0 - order1.price.compareTo(order2.price)
@@ -39,9 +40,14 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
        price
     }
   }
+
+  // TODO: make buyerQueue and sellerQueue vals. While the queues themselves are
+  // TODO: mutable, this impl doesn't need to create new collections after
+  // TODO: construction
   /**
    * Queue used to organize Buyer Orders
    */
+  // TODO: use Scala PriorityQueue instead of Java http://www.scala-lang.org/api/2.11.5/index.html#scala.collection.mutable.PriorityQueue
   private var buyerQueue = new PriorityQueue[Order](defaultQueueSize, buyerComparator)
   /**
    * Queue used to organize Seller Orders
@@ -107,6 +113,10 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
       None
     }
     else {
+      // TODO: to create a defensive copy should be able to use:
+      // TODO: import scala.collection.JavaConverters._
+      // TODO: buyerQueue.iterator.asScala.toArray
+      // TODO: though once these are Scala collections you can just use .toArray
       val bqCpy = new PriorityQueue[Order](buyerQueue)
       val buyers = new Array[Order](bqCpy.size())
       var x = 0
@@ -123,6 +133,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
       None
     }
     else {
+      // TODO: same as above
       val sqCpy = new PriorityQueue[Order](sellerQueue)
       val sellers = new Array[Order](sqCpy.size())
       var x = 0
@@ -142,6 +153,8 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
   private def getOldestMatch(price: Double): Option[Order] = {
     val bqCpy = new PriorityQueue[Order](buyerQueue)
     var lowest = bqCpy.peek()
+    // TODO: rewrite as recursive method to remove breaks (idiomatic Scala uses
+    // TODO: no breaks)
     val loop = new Breaks
     loop.breakable {
       while (bqCpy.peek().price >= price) {
@@ -165,9 +178,12 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
    * @return Order based on OrderID
    */
   private def getOrderByID(
+    // TODO: use Scala PriorityQueue
     queue: java.util.PriorityQueue[Order],
     id: Long): Option[Order] = {
-
+    // TODO: once using Scala PriorityQueue, searching for element becomes
+    // TODO: trivial (queue.find(_.orderId == id)) so this method may not be
+    // TODO: needed
     val iterator = queue.iterator()
     while(iterator.hasNext){
       val current = iterator.next()
@@ -184,10 +200,12 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
   override def toString(): String = {
     val buyer = new PriorityQueue[Order](buyerQueue)
     val seller = new PriorityQueue[Order](sellerQueue)
+    // TODO: when building strings, most efficient way is to use StringBuilder
     var res: String = symbol + ": \n"
     var curr: Order = null
     var position = 12
     res = res + "Buyers: \n"
+    // TODO: convert these to map (or foreach append to StringBuilder)
     while(!buyer.isEmpty){
       curr = buyer.poll()
       res = res + position + ": $" + curr.price + " ," + "Shares: " + curr.qty + ", Time: " + curr.timestamp + "\n"
@@ -201,6 +219,7 @@ class OrderBookImpl(val symbol: String) extends OrderBook {
       position += 1
     }
 
+    // TODO don't need return
     return res
   }
 }
